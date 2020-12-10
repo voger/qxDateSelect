@@ -49,19 +49,15 @@ qx.Class.define("qxDateSelect.demo.Application",
       -------------------------------------------------------------------------
       */
 
-      // Create a button
-      var button1 = new qxDateSelect.Button("Very special button", "qxDateSelect/test.png");
 
       // Document is the application root
       var doc = this.getRoot();
 
-      // Add button to document at fixed coordinates
-      doc.add(button1, {left: 100, top: 50});
+      var dateSelect = new qxDateSelect.QxDateSelect();
 
-      // Add an event listener
-      button1.addListener("execute", function(e) {
-        alert("Hello World!");
-      });
+      doc.add(dateSelect, {left: 50, top: 50});
+
+
     }
   }
 });
