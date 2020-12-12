@@ -12,8 +12,13 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       init: false,
     },
 
+    appearance: {
+      refine: true,
+      init: "qx-date-select",
+    },
+
     /**
-     * This property determines the order in which
+     * Determines the order in which
      * the select boxes appear
      *
      */
@@ -21,7 +26,28 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       check: ["DMY", "YDM", "MDY", "YMD", "DYM"],
       init: "DMY",
       apply: "_applyFormat",
-      nullable: false
+      nullable: false,
+    },
+
+    /**
+     * Selectable years. It can be a range in the format
+     * `startYear..endYear"` where `startYear` is smaller
+     * than end year or a list of integers.
+     */
+    years: {
+      deferredInit: true,
+      nullable: false,
+      apply: "_applyYears",
+      transform: "_transformYears",
+      validate: "_validateYears",
+    },
+
+    reverseYears: {
+      nullable: false,
+      init: true,
+      deferredInit: true,
+      check: "Boolean",
+      apply: "_applyReverseYears",
     },
   },
 
@@ -40,11 +66,19 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
     this._setLayout(layout);
 
+    // initialize the date range
+    var currentDate = new Date();
+    var currentYear = currentDate.getFullYear();
+    var lastCentury = currentYear - 100;
+    this.setYears(lastCentury + ".." + currentYear);
+
     if (format !== undefined) {
       this.setFormat(format);
     } else {
       this.initFormat();
     }
+
+    this.initReverseYears();
   },
 
   members: {
@@ -66,17 +100,17 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
       switch (id) {
         case "day":
-          control = new qx.ui.form.SelectBox();
+          control = new qx.ui.form.VirtualSelectBox();
           control.setFocusable(true);
           break;
 
         case "month":
-          control = new qx.ui.form.SelectBox();
+          control = new qx.ui.form.VirtualSelectBox();
           control.setFocusable(true);
           break;
 
         case "year":
-          control = new qx.ui.form.SelectBox();
+          control = new qx.ui.form.VirtualSelectBox();
           control.setFocusable(true);
           break;
       }
@@ -102,10 +136,54 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
             control = this.getChildControl("year");
             break;
           default:
-            throw "This shouldn't happen.";
+            throw new Error("This shouldn't happen.");
         }
         this._add(control, { row: 0, column: i });
       }
+    },
+
+    _transformYears: function (val) {
+      if (qx.lang.Type.isArray(val)) {
+        return val.sort(function (a, b) {
+          return a - b;
+        });
+      }
+      var range = qx.util.StringSplit.split(val, "..");
+      var rangeInts = range.map(function (year) {
+        return parseInt(year);
+      });
+      return qx.module.util.Array.range(rangeInts[0], rangeInts[1] + 1);
+    },
+
+    _validateYears: function (val) {
+      try {
+        // eslint-disable-next-line array-callback-return
+        val.map(function (year) {
+          qx.core.Assert.assertInteger(year);
+        });
+      } catch (e) {
+        throw new qx.core.ValidationError(
+          "Validation Error: Invalid value for property years."
+        );
+      }
+    },
+
+    _applyYears: function (value) {
+      var model = new qx.data.Array(value);
+
+      var yearSelect = this.getChildControl("year");
+      yearSelect.setModel(model);
+    },
+
+    _applyReverseYears: function (value) {
+      var delegate = {
+        sorter: function (a, b) {
+          return !value ? a - b : b - a;
+        },
+      };
+
+      var yearSelect = this.getChildControl("year");
+      yearSelect.setDelegate(delegate);
     },
   },
 });
