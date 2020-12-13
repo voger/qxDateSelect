@@ -102,11 +102,27 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
         case "day":
           control = new qx.ui.form.VirtualSelectBox();
           control.setFocusable(true);
+
+          var _this = this;
+          var opts = {
+            converter: _this._getDaysOfMonth.bind(_this),
+          };
+
+          var monthControl = this.getChildControl("month");
+          var monthSelection = monthControl.getSelection();
+
+          var yearControl = this.getChildControl("year");
+          var yearSelection = yearControl.getSelection();
+
+          monthSelection.bind("change", control, "model", opts);
+          yearSelection.bind("change", control, "model", opts);
           break;
 
         case "month":
           control = new qx.ui.form.VirtualSelectBox();
           control.setFocusable(true);
+          control.setModel(this._getMonths());
+          control.setLabelPath("label");
           break;
 
         case "year":
@@ -116,6 +132,41 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       }
 
       return control || this.base(arguments, id);
+    },
+
+    _getDaysOfMonth: function () {
+      var year = this.getChildControl("year").getValue();
+      var month = this.getChildControl("month").getValue();
+
+      var days = new Date(year, month, 0).getDate() || 31;
+
+      // make it inclusive
+      var daysRange = qx.module.util.Array.range(1, days + 1);
+      return new qx.data.Array(daysRange);
+    },
+
+    /**
+     * Function to create a list of months in a year
+     * @returns {qx.core.Object} json representation of the months
+     * @private
+     */
+    _getMonths: function () {
+      var monthList = [
+        { value: 0, label: this.tr("Month") },
+        { value: 1, label: this.tr("January") },
+        { value: 2, label: this.tr("February") },
+        { value: 3, label: this.tr("March") },
+        { value: 4, label: this.tr("April") },
+        { value: 5, label: this.tr("May") },
+        { value: 6, label: this.tr("June") },
+        { value: 7, label: this.tr("July") },
+        { value: 8, label: this.tr("August") },
+        { value: 9, label: this.tr("September") },
+        { value: 10, label: this.tr("October") },
+        { value: 11, label: this.tr("November") },
+        { value: 12, label: this.tr("December") },
+      ];
+      return qx.data.marshal.Json.createModel(monthList);
     },
 
     _applyFormat: function (value) {
@@ -144,10 +195,9 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
     _transformYears: function (val) {
       if (qx.lang.Type.isArray(val)) {
-        return val.sort(function (a, b) {
-          return a - b;
-        });
+        return val;
       }
+
       var range = qx.util.StringSplit.split(val, "..");
       var rangeInts = range.map(function (year) {
         return parseInt(year);
