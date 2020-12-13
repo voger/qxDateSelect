@@ -3,18 +3,18 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
   implement: [qx.ui.form.IForm, qx.ui.form.IDateForm],
   include: [
     // qx.ui.core.MChildrenHandling,
-    qx.ui.form.MForm,
+    qx.ui.form.MForm
   ],
 
   properties: {
     focusable: {
       refine: true,
-      init: false,
+      init: false
     },
 
     appearance: {
       refine: true,
-      init: "qx-date-select",
+      init: "qx-date-select"
     },
 
     /**
@@ -26,7 +26,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       check: ["DMY", "YDM", "MDY", "YMD", "DYM"],
       init: "DMY",
       apply: "_applyFormat",
-      nullable: false,
+      nullable: false
     },
 
     /**
@@ -39,7 +39,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       nullable: false,
       apply: "_applyYears",
       transform: "_transformYears",
-      validate: "_validateYears",
+      validate: "_validateYears"
     },
 
     reverseYears: {
@@ -47,12 +47,12 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       init: true,
       deferredInit: true,
       check: "Boolean",
-      apply: "_applyReverseYears",
-    },
+      apply: "_applyReverseYears"
+    }
   },
 
   events: {
-    changeValue: "qx.event.type.Data",
+    changeValue: "qx.event.type.Data"
   },
 
   construct: function (date, format) {
@@ -105,7 +105,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
           var _this = this;
           var opts = {
-            converter: _this._getDaysOfMonth.bind(_this),
+            converter: _this._getDaysOfMonth.bind(_this)
           };
 
           var monthControl = this.getChildControl("month");
@@ -135,8 +135,8 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     },
 
     _getDaysOfMonth: function () {
-      var year = this.getChildControl("year").getValue();
-      var month = this.getChildControl("month").getValue();
+      var year = this.__getYear();
+      var month = this.__getMonth();
 
       var days = new Date(year, month, 0).getDate() || 31;
 
@@ -164,7 +164,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
         { value: 9, label: this.tr("September") },
         { value: 10, label: this.tr("October") },
         { value: 11, label: this.tr("November") },
-        { value: 12, label: this.tr("December") },
+        { value: 12, label: this.tr("December") }
       ];
       return qx.data.marshal.Json.createModel(monthList);
     },
@@ -229,11 +229,18 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       var delegate = {
         sorter: function (a, b) {
           return !value ? a - b : b - a;
-        },
+        }
       };
 
       var yearSelect = this.getChildControl("year");
       yearSelect.setDelegate(delegate);
     },
-  },
+    __getYear: function () {
+      return this.getChildControl("year").getValue();
+    },
+    __getMonth: function () {
+      var monthSelection = this.getChildControl("month").getValue();
+      return monthSelection.getValue();
+    }
+  }
 });
