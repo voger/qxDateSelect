@@ -3,18 +3,18 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
   implement: [qx.ui.form.IForm, qx.ui.form.IDateForm],
   include: [
     // qx.ui.core.MChildrenHandling,
-    qx.ui.form.MForm
+    qx.ui.form.MForm,
   ],
 
   properties: {
     focusable: {
       refine: true,
-      init: false
+      init: false,
     },
 
     appearance: {
       refine: true,
-      init: "qx-date-select"
+      init: "qx-date-select",
     },
 
     /**
@@ -26,7 +26,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       check: ["DMY", "YDM", "MDY", "YMD", "DYM"],
       init: "DMY",
       apply: "_applyFormat",
-      nullable: false
+      nullable: false,
     },
 
     /**
@@ -39,7 +39,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       nullable: false,
       apply: "_applyYears",
       transform: "_transformYears",
-      validate: "_validateYears"
+      validate: "_validateYears",
     },
 
     reverseYears: {
@@ -47,12 +47,12 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       init: true,
       deferredInit: true,
       check: "Boolean",
-      apply: "_applyReverseYears"
-    }
+      apply: "_applyReverseYears",
+    },
   },
 
   events: {
-    changeValue: "qx.event.type.Data"
+    changeValue: "qx.event.type.Data",
   },
 
   construct: function (date, format) {
@@ -101,11 +101,19 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       switch (id) {
         case "day":
           control = new qx.ui.form.VirtualSelectBox();
+
+          control.addListener(
+            "changeModel",
+            function () {
+              this._onChangeChildModel(control, id);
+            },
+            this
+          );
           control.setFocusable(true);
 
           var _this = this;
           var opts = {
-            converter: _this._getDaysOfMonth.bind(_this)
+            converter: _this._getDaysOfMonth.bind(_this),
           };
 
           var monthControl = this.getChildControl("month");
@@ -120,13 +128,31 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
         case "month":
           control = new qx.ui.form.VirtualSelectBox();
+
+          control.addListener(
+            "changeModel",
+            function () {
+              this._onChangeChildModel(control, id);
+            },
+            this
+          );
+
           control.setFocusable(true);
+
           control.setModel(this._getMonths());
+          control.fireEvent("changeModel");
           control.setLabelPath("label");
           break;
 
         case "year":
           control = new qx.ui.form.VirtualSelectBox();
+          control.addListener(
+            "changeModel",
+            function () {
+              this._onChangeChildModel(control, id);
+            },
+            this
+          );
           control.setFocusable(true);
           break;
       }
@@ -152,7 +178,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
      */
     _getMonths: function () {
       var monthList = [
-        { value: 0, label: this.tr("Month") },
+        // { value: 0, label: this.tr("Month") },
         { value: 1, label: this.tr("January") },
         { value: 2, label: this.tr("February") },
         { value: 3, label: this.tr("March") },
@@ -164,7 +190,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
         { value: 9, label: this.tr("September") },
         { value: 10, label: this.tr("October") },
         { value: 11, label: this.tr("November") },
-        { value: 12, label: this.tr("December") }
+        { value: 12, label: this.tr("December") },
       ];
       return qx.data.marshal.Json.createModel(monthList);
     },
@@ -225,22 +251,51 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       yearSelect.setModel(model);
     },
 
+    _onChangeChildModel: function (control, id) {
+      var model = control.getModel();
+      var label;
+      switch (id) {
+        case "day":
+          label = this.tr("Day");
+          model.unshift(label);
+          break;
+        case "month":
+          label = this.tr("Month");
+          var data = { value: null, label: label };
+          // when we push an new model item, the whole model changes
+          // which makes the `changeModel` event to be emmited again
+          // Here we check if we have already pushed our label so we
+          // don't end up with two labels.
+          model.getItem(0).getValue() !== null &&
+            model.unshift(qx.data.marshal.Json.createModel(data, true));
+          break;
+        case "year":
+          label = this.tr("Year");
+          model.unshift(label);
+          break;
+        default:
+          throw new Error("This shouldn't happen.");
+      }
+    },
+
     _applyReverseYears: function (value) {
       var delegate = {
         sorter: function (a, b) {
           return !value ? a - b : b - a;
-        }
+        },
       };
 
       var yearSelect = this.getChildControl("year");
       yearSelect.setDelegate(delegate);
     },
+
     __getYear: function () {
       return this.getChildControl("year").getValue();
     },
+
     __getMonth: function () {
       var monthSelection = this.getChildControl("month").getValue();
       return monthSelection.getValue();
-    }
-  }
+    },
+  },
 });
