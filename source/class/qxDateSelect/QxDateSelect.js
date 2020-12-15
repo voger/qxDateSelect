@@ -66,6 +66,10 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
     this._setLayout(layout);
 
+    this.getChildControl("year");
+    this.getChildControl("month");
+    this.getChildControl("day");
+
     // initialize the date range
     var currentDate = new Date();
     var currentYear = currentDate.getFullYear();
@@ -82,6 +86,10 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
   },
 
   members: {
+    __daysContoller: null,
+    __monthsController: null,
+    __yearsController: null,
+
     setValue: function (value) {
       this.debug("setValue(): To be done");
     },
@@ -100,8 +108,9 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
       switch (id) {
         case "day":
-          control = new qx.ui.form.VirtualSelectBox();
+          control = new qx.ui.form.SelectBox();
           control.setFocusable(true);
+          this.__daysController = new qx.data.controller.List(null, control);
 
           control.addListener(
             "changeModel",
@@ -122,13 +131,34 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
           var yearControl = this.getChildControl("year");
           var yearSelection = yearControl.getSelection();
 
-          monthSelection.bind("change", control, "model", opts);
-          yearSelection.bind("change", control, "model", opts);
+          monthControl.bind(
+            "changeSelection",
+            this.__daysController,
+            "model",
+            opts
+          );
+          yearControl.bind(
+            "changeSelection",
+            this.__daysController,
+            "model",
+            opts
+          );
           break;
 
         case "month":
-          control = new qx.ui.form.VirtualSelectBox();
+          control = new qx.ui.form.SelectBox();
           control.setFocusable(true);
+          this.__monthsController = new qx.data.controller.List(
+            null,
+            control,
+            "label"
+          );
+          this.__monthsController.setDelegate({
+            bindItem: function (controller, item, index) {
+              controller.bindProperty("label", "label", null, item, index);
+              controller.bindProperty("value", "model", null, item, index);
+            },
+          });
 
           control.addListener(
             "changeModel",
@@ -138,13 +168,19 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
             this
           );
 
-          control.setLabelPath("label");
-          control.setModel(this._getMonths());
+          this.__monthsController.setModel(this._getMonths());
           break;
 
         case "year":
-          control = new qx.ui.form.VirtualSelectBox();
+          control = new qx.ui.form.SelectBox();
           control.setFocusable(true);
+          this.__yearsController = new qx.data.controller.List(null, control);
+          this.__yearsController.setDelegate({
+            bindItem: function (controller, item, index) {
+              controller.bindProperty("", "label", null, item, index);
+              controller.bindProperty("", "model", null, item, index);
+            },
+          });
 
           control.addListener(
             "changeModel",
@@ -245,8 +281,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     _applyYears: function (value) {
       var model = new qx.data.Array(value);
 
-      var yearSelect = this.getChildControl("year");
-      yearSelect.setModel(model);
+      this.__yearsController.setModel(model);
     },
 
     _onChangeChildModel: function (control, id) {
@@ -273,7 +308,6 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
           break;
         default:
           throw new Error("This shouldn't happen.");
-
       }
 
       var firstItem = model.getItem(0);
@@ -282,14 +316,12 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     },
 
     _applyReverseYears: function (value) {
-      var delegate = {
-        sorter: function (a, b) {
-          return !value ? a - b : b - a;
-        },
-      };
-
-      var yearSelect = this.getChildControl("year");
-      yearSelect.setDelegate(delegate);
+      var model = this.__yearsController.getModel();
+      debugger;
+       model.sort(function (a, b) {
+        return !value ? a - b : b - a;
+      });
+      this.__yearsController.setModel(model);
     },
 
     __getYear: function () {
@@ -297,8 +329,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     },
 
     __getMonth: function () {
-      var monthSelection = this.getChildControl("month").getValue();
-      return monthSelection.getValue();
+      return this.getChildControl("month").getValue();
     },
   },
 });
