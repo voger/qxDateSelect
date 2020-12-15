@@ -101,15 +101,15 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       switch (id) {
         case "day":
           control = new qx.ui.form.VirtualSelectBox();
+          control.setFocusable(true);
 
           control.addListener(
             "changeModel",
-            function () {
+            function (e) {
               this._onChangeChildModel(control, id);
             },
             this
           );
-          control.setFocusable(true);
 
           var _this = this;
           var opts = {
@@ -128,6 +128,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
         case "month":
           control = new qx.ui.form.VirtualSelectBox();
+          control.setFocusable(true);
 
           control.addListener(
             "changeModel",
@@ -137,15 +138,14 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
             this
           );
 
-          control.setFocusable(true);
-
-          control.setModel(this._getMonths());
-          control.fireEvent("changeModel");
           control.setLabelPath("label");
+          control.setModel(this._getMonths());
           break;
 
         case "year":
           control = new qx.ui.form.VirtualSelectBox();
+          control.setFocusable(true);
+
           control.addListener(
             "changeModel",
             function () {
@@ -153,7 +153,6 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
             },
             this
           );
-          control.setFocusable(true);
           break;
       }
 
@@ -178,7 +177,6 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
      */
     _getMonths: function () {
       var monthList = [
-        // { value: 0, label: this.tr("Month") },
         { value: 1, label: this.tr("January") },
         { value: 2, label: this.tr("February") },
         { value: 3, label: this.tr("March") },
@@ -275,7 +273,12 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
           break;
         default:
           throw new Error("This shouldn't happen.");
+
       }
+
+      var firstItem = model.getItem(0);
+      control.getSelection().push(firstItem);
+      firstItem.setSelectable(false);
     },
 
     _applyReverseYears: function (value) {
