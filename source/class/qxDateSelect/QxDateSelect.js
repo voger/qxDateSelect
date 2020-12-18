@@ -294,8 +294,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
       // restore old selection if available or set
       // label as selection
-      var selectionIndex = model.indexOf(selection);
-      if (selectionIndex < 0) {
+      if (model.indexOf(selection) < 0) {
         control.setSelection([labelItem]);
       } else {
         controller.getSelection().setItem(0, selection);
@@ -327,6 +326,12 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       return listItem;
     },
 
+    /**
+     * Creates a list item to be inserted as a label
+     * to a select box.
+     * @param label {String} the label of the list item
+     * @return qx.ui.form.ListItem
+     */
     __createLabelItem: function (label) {
       var listItem = new qx.ui.form.ListItem(label);
       listItem.setEnabled(false);
