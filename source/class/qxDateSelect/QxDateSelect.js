@@ -58,7 +58,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
   construct: function (date, format) {
     this.base(arguments);
 
-    var layout = new qx.ui.layout.Grid();
+    var layout = new qx.ui.layout.Grid(6);
     layout.setAllowGrowSpannedCellWidth(true);
     layout.setColumnAlign(0, "left", "top");
     layout.setColumnAlign(1, "center", "top");
