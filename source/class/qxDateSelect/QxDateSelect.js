@@ -120,7 +120,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       switch (id) {
         case "day":
           control = this.__daysSelect = new qx.ui.form.SelectBox();
-          this.__daysLabel = new qx.ui.form.ListItem(this.tr("Day"));
+          this.__daysLabel = this.__createLabelItem(this.tr("Day"));
           control.setFocusable(true);
           this.__daysController = new qx.data.controller.List(null, control);
 
@@ -145,7 +145,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
         case "month":
           control = this.__monthsSelect = new qx.ui.form.SelectBox();
           control.setFocusable(true);
-          this.__monthsLabel = new qx.ui.form.ListItem(this.tr("Month"));
+          this.__monthsLabel = this.__createLabelItem(this.tr("Month"));
           this.__monthsController = new qx.data.controller.List(
             null,
             control,
@@ -165,7 +165,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
           control = this.__yearsSelect = new qx.ui.form.SelectBox();
           control.setFocusable(true);
 
-          this.__yearsLabel = new qx.ui.form.ListItem(this.tr("Year"));
+          this.__yearsLabel = this.__createLabelItem(this.tr("Year"));
           this.__yearsController = new qx.data.controller.List(null, control);
           this.__yearsController.setDelegate({
             bindItem: function (controller, item, index) {
@@ -324,6 +324,12 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
         default:
           throw new Error("This shouldn't happen.");
       }
+      return listItem;
+    },
+
+    __createLabelItem: function (label) {
+      var listItem = new qx.ui.form.ListItem(label);
+      listItem.setEnabled(false);
       return listItem;
     },
 
