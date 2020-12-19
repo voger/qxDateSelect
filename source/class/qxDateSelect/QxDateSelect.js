@@ -3,18 +3,18 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
   implement: [qx.ui.form.IForm, qx.ui.form.IDateForm],
   include: [
     // qx.ui.core.MChildrenHandling,
-    qx.ui.form.MForm
+    qx.ui.form.MForm,
   ],
 
   properties: {
     focusable: {
       refine: true,
-      init: false
+      init: false,
     },
 
     appearance: {
       refine: true,
-      init: "qx-date-select"
+      init: "qx-date-select",
     },
 
     /**
@@ -26,7 +26,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       check: ["DMY", "YDM", "MDY", "YMD", "DYM"],
       init: "DMY",
       apply: "_applyFormat",
-      nullable: false
+      nullable: false,
     },
 
     /**
@@ -39,7 +39,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       nullable: false,
       apply: "_applyYears",
       transform: "_transformYears",
-      validate: "_validateYears"
+      validate: "_validateYears",
     },
 
     reverseYears: {
@@ -47,12 +47,12 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       init: true,
       deferredInit: true,
       check: "Boolean",
-      apply: "_applyReverseYears"
-    }
+      apply: "_applyReverseYears",
+    },
   },
 
   events: {
-    changeValue: "qx.event.type.Data"
+    changeValue: "qx.event.type.Data",
   },
 
   construct: function (date, format) {
@@ -101,8 +101,19 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     __monthsLabel: null,
     __yearsLabel: null,
 
+    /**
+     * Sets the date
+     *
+     * @param {Date} The date to set.
+     */
     setValue: function (value) {
-      this.debug("setValue(): To be done");
+      // order matters otherwise February 29 might mess up
+      this.__yearsController.getSelection().setItem(0, value.getFullYear());
+      this.__monthsController.getSelection().setItem(0, value.getMonth());
+      this.__daysController.getSelection().setItem(0, value.getDate());
+
+      // don't emmit the value. We need to emmit our own value
+      this.fireDataEvent("changeValue", this.getValue());
     },
 
     resetValue: function (value) {
@@ -110,7 +121,22 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     },
 
     getValue: function (value) {
-      this.debug("getValue(): To be done");
+      var year = this.__getYear();
+      var month = this.__getMonth();
+      var day = this.__getDay();
+
+      var date = new Date(year, month, day, 0, 0);
+
+      // Javascript overfloods dates. Prevent that
+      if (
+        date.getFullYear() !== year &&
+        date.getMonth() !== month &&
+        date.getDate() !== day
+      ) {
+        return null;
+      }
+
+      return date;
     },
 
     // overridden
@@ -155,7 +181,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
             bindItem: function (controller, item, index) {
               controller.bindProperty("label", "label", null, item, index);
               controller.bindProperty("value", "model", null, item, index);
-            }
+            },
           });
 
           this.__setChildModel(this.__monthsController, this._getMonths());
@@ -171,7 +197,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
             bindItem: function (controller, item, index) {
               controller.bindProperty("", "label", null, item, index);
               controller.bindProperty("", "model", null, item, index);
-            }
+            },
           });
           break;
       }
@@ -212,7 +238,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
         { value: 9, label: this.tr("September") },
         { value: 10, label: this.tr("October") },
         { value: 11, label: this.tr("November") },
-        { value: 12, label: this.tr("December") }
+        { value: 12, label: this.tr("December") },
       ];
       return qx.data.marshal.Json.createModel(monthList);
     },
@@ -346,6 +372,11 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     __getMonth: function () {
       var selected = this.__monthsController.getSelection();
       return selected.getItem(0);
-    }
-  }
+    },
+
+    __getDay: function () {
+      var selected = this.__daysController.getSelection();
+      return selected.getItem(0);
+    },
+  },
 });
