@@ -75,7 +75,8 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     this.getChildControl("day").addListener(
       "changeSelection",
       function () {
-        this.fireDataEvent("changeValue", this.getValue());
+        this.__emmitChangeValue &&
+          this.fireDataEvent("changeValue", this.getValue());
       },
       this
     );
@@ -100,18 +101,21 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     __monthsController: null,
     __yearsController: null,
 
+    // flag to prevent emmitting change value
+    __emmitChangeValue: true,
     /**
      * Sets the date
      *
      * @param {Date} The date to set.
      */
     setValue: function (value) {
+      this.__emmitChangeValue = false;
       // order matters otherwise February 29 might mess up
       this.__yearsController.getSelection().setItem(0, value.getFullYear());
       this.__monthsController.getSelection().setItem(0, value.getMonth());
       this.__daysController.getSelection().setItem(0, value.getDate());
 
-      // don't emmit the value. We need to emmit our own value
+      this.__emmitChangeValue = true;
       this.fireDataEvent("changeValue", this.getValue());
     },
 
@@ -128,8 +132,8 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
       // Javascript overfloods dates. Prevent that
       if (
-        date.getFullYear() !== year &&
-        date.getMonth() !== month &&
+        date.getFullYear() !== year ||
+        date.getMonth() !== month ||
         date.getDate() !== day
       ) {
         return null;
@@ -331,7 +335,10 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
       // disable the nullValue list item
       var control = controller.getTarget();
-      control.getChildren()[0].setEnabled(false);
+      var nullItem = control.getChildren().find(function (item) {
+        return null === item.getModel();
+      });
+      nullItem.setEnabled(false);
     },
 
     /**
