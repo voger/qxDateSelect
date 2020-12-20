@@ -66,10 +66,19 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
     this._setLayout(layout);
 
-    this.getChildControl("year");
-    this.getChildControl("month");
-    this.getChildControl("day");
+    // this.getChildControl("year");
+    // this.getChildControl("month");
 
+    // days model changes every time a select box is
+    // changed so we should listen to it in order to
+    // know if the value has changed.
+    this.getChildControl("day").addListener(
+      "changeSelection",
+      function () {
+        this.fireDataEvent("changeValue", this.getValue());
+      },
+      this
+    );
     // initialize the date range
     var currentDate = new Date();
     var currentYear = currentDate.getFullYear();
@@ -90,16 +99,6 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     __daysContoller: null,
     __monthsController: null,
     __yearsController: null,
-
-    // select boxes
-    __daysSelect: null,
-    __monthsSelect: null,
-    __yearsSelect: null,
-
-    // label items
-    __daysLabel: null,
-    __monthsLabel: null,
-    __yearsLabel: null,
 
     /**
      * Sets the date
@@ -145,38 +144,51 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
       switch (id) {
         case "day":
-          control = this.__daysSelect = new qx.ui.form.SelectBox();
-          this.__daysLabel = this.__createLabelItem(this.tr("Day"));
+          control = new qx.ui.form.SelectBox();
           control.setFocusable(true);
+
           this.__daysController = new qx.data.controller.List(null, control);
+          this.__daysController.set({
+            allowNull: true,
+            nullValueTitle: "Day",
+          });
+          this.__daysController.setDelegate({
+            bindItem: function (controller, item, index) {
+              controller.bindProperty("", "label", null, item, index);
+              controller.bindProperty("", "model", null, item, index);
+            },
+          });
 
-          var monthControl = this.__monthsSelect;
-          var yearControl = this.__yearsSelect;
-
-          [monthControl, yearControl].forEach(function (eventTarget) {
-            eventTarget.addListener(
-              "changeSelection",
-              function () {
-                var year = this.__getYear();
-                var month = this.__getMonth();
-                var model = this.__getDaysOfMonth(year, month);
-                this.__setChildModel(this.__daysController, model);
-              },
-              this
-            );
-          }, this);
-
+          [this.getChildControl("month"), this.getChildControl("year")].forEach(
+            function (eventTarget) {
+              eventTarget.addListener(
+                "changeSelection",
+                function () {
+                  var year = this.__getYear();
+                  var month = this.__getMonth();
+                  var model = this.__getDaysOfMonth(year, month);
+                  this.__setChildModel(this.__daysController, model);
+                },
+                this
+              );
+            },
+            this
+          );
           break;
 
         case "month":
-          control = this.__monthsSelect = new qx.ui.form.SelectBox();
+          control = new qx.ui.form.SelectBox();
           control.setFocusable(true);
-          this.__monthsLabel = this.__createLabelItem(this.tr("Month"));
           this.__monthsController = new qx.data.controller.List(
             null,
             control,
             "label"
           );
+
+          this.__monthsController.set({
+            allowNull: true,
+            nullValueTitle: "Month",
+          });
           this.__monthsController.setDelegate({
             bindItem: function (controller, item, index) {
               controller.bindProperty("label", "label", null, item, index);
@@ -188,11 +200,14 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
           break;
 
         case "year":
-          control = this.__yearsSelect = new qx.ui.form.SelectBox();
+          control = new qx.ui.form.SelectBox();
           control.setFocusable(true);
 
-          this.__yearsLabel = this.__createLabelItem(this.tr("Year"));
           this.__yearsController = new qx.data.controller.List(null, control);
+          this.__yearsController.set({
+            allowNull: true,
+            nullValueTitle: "Year",
+          });
           this.__yearsController.setDelegate({
             bindItem: function (controller, item, index) {
               controller.bindProperty("", "label", null, item, index);
@@ -213,7 +228,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
      * @return {qx.data.Array} the array of the days
      */
     __getDaysOfMonth: function (year, month) {
-      var days = new Date(year, month, 0).getDate() || 31;
+      var days = new Date(year, month + 1, 0).getDate() || 31;
 
       // make it inclusive
       var daysRange = qx.module.util.Array.range(1, days + 1);
@@ -227,18 +242,18 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
      */
     _getMonths: function () {
       var monthList = [
-        { value: 1, label: this.tr("January") },
-        { value: 2, label: this.tr("February") },
-        { value: 3, label: this.tr("March") },
-        { value: 4, label: this.tr("April") },
-        { value: 5, label: this.tr("May") },
-        { value: 6, label: this.tr("June") },
-        { value: 7, label: this.tr("July") },
-        { value: 8, label: this.tr("August") },
-        { value: 9, label: this.tr("September") },
-        { value: 10, label: this.tr("October") },
-        { value: 11, label: this.tr("November") },
-        { value: 12, label: this.tr("December") },
+        { value: 0, label: this.tr("January") },
+        { value: 1, label: this.tr("February") },
+        { value: 2, label: this.tr("March") },
+        { value: 3, label: this.tr("April") },
+        { value: 4, label: this.tr("May") },
+        { value: 5, label: this.tr("June") },
+        { value: 6, label: this.tr("July") },
+        { value: 7, label: this.tr("August") },
+        { value: 8, label: this.tr("September") },
+        { value: 9, label: this.tr("October") },
+        { value: 10, label: this.tr("November") },
+        { value: 11, label: this.tr("December") },
       ];
       return qx.data.marshal.Json.createModel(monthList);
     },
@@ -252,13 +267,13 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       for (var i = 0; i < parts.length; i++) {
         switch (parts[i]) {
           case "D":
-            control = this.__daysSelect;
+            control = this.getChildControl("day");
             break;
           case "M":
-            control = this.__monthsSelect;
+            control = this.getChildControl("month");
             break;
           case "Y":
-            control = this.__yearsSelect;
+            control = this.getChildControl("year");
             break;
           default:
             throw new Error("This shouldn't happen.");
@@ -307,24 +322,16 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     },
 
     __setChildModel: function (controller, model) {
-      var control = controller.getTarget();
-
       // save old selection to restore it
       var selection = controller.getSelection().getItem(0);
 
-      control.removeAll();
       controller.setModel(model);
 
-      var labelItem = this.__getLabelItem(control);
-      control.addAt(labelItem, 0);
+      controller.getSelection().setItem(0, selection);
 
-      // restore old selection if available or set
-      // label as selection
-      if (model.indexOf(selection) < 0) {
-        control.setSelection([labelItem]);
-      } else {
-        controller.getSelection().setItem(0, selection);
-      }
+      // disable the nullValue list item
+      var control = controller.getTarget();
+      control.getChildren()[0].setEnabled(false);
     },
 
     /**
@@ -335,21 +342,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
      * @return {qx.ui.form.ListItem} the list item serving as a label
      */
     __getLabelItem: function (control) {
-      var listItem;
-      switch (control) {
-        case this.__daysSelect:
-          listItem = this.__daysLabel;
-          break;
-        case this.__monthsSelect:
-          listItem = this.__monthsLabel;
-          break;
-        case this.__yearsSelect:
-          listItem = this.__yearsLabel;
-          break;
-        default:
-          throw new Error("This shouldn't happen.");
-      }
-      return listItem;
+      return control.getUserData("labelItem");
     },
 
     /**
