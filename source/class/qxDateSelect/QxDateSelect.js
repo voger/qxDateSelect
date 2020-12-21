@@ -3,18 +3,18 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
   implement: [qx.ui.form.IForm, qx.ui.form.IDateForm],
   include: [
     // qx.ui.core.MChildrenHandling,
-    qx.ui.form.MForm,
+    qx.ui.form.MForm
   ],
 
   properties: {
     focusable: {
       refine: true,
-      init: false,
+      init: false
     },
 
     appearance: {
       refine: true,
-      init: "qx-date-select",
+      init: "qx-date-select"
     },
 
     /**
@@ -26,13 +26,13 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       check: ["DMY", "YDM", "MDY", "YMD", "DYM"],
       init: "DMY",
       apply: "_applyFormat",
-      nullable: false,
+      nullable: false
     },
 
     allowNull: {
       init: false,
       check: "Boolean",
-      apply: "_applyAllowNull",
+      apply: "_applyAllowNull"
     },
 
     /**
@@ -45,7 +45,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       nullable: false,
       apply: "_applyYears",
       transform: "_transformYears",
-      validate: "_validateYears",
+      validate: "_validateYears"
     },
 
     reverseYears: {
@@ -53,8 +53,8 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       init: true,
       deferredInit: true,
       check: "Boolean",
-      apply: "_applyReverseYears",
-    },
+      apply: "_applyReverseYears"
+    }
   },
 
   events: {
@@ -68,7 +68,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
      *
      *
      */
-    changeValue: "qx.event.type.Data",
+    changeValue: "qx.event.type.Data"
   },
 
   construct: function (date, format) {
@@ -119,10 +119,10 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
     // flag to prevent emmitting change value
     __emmitChangeValue: true,
+
     /**
      * Sets the date
-     *
-     * @param {Date} The date to set.
+     * @param value {Date} The date to set.
      */
     setValue: function (value) {
       this.__emmitChangeValue = false;
@@ -170,13 +170,13 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
           this.__daysController = new qx.data.controller.List(null, control);
           this.__daysController.set({
             allowNull: true,
-            nullValueTitle: "Day",
+            nullValueTitle: "Day"
           });
           this.__daysController.setDelegate({
             bindItem: function (controller, item, index) {
               controller.bindProperty("", "label", null, item, index);
               controller.bindProperty("", "model", null, item, index);
-            },
+            }
           });
 
           [this.getChildControl("month"), this.getChildControl("year")].forEach(
@@ -207,13 +207,13 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
           this.__monthsController.set({
             allowNull: true,
-            nullValueTitle: "Month",
+            nullValueTitle: "Month"
           });
           this.__monthsController.setDelegate({
             bindItem: function (controller, item, index) {
               controller.bindProperty("label", "label", null, item, index);
               controller.bindProperty("value", "model", null, item, index);
-            },
+            }
           });
 
           this.__setChildModel(this.__monthsController, this._getMonths());
@@ -226,13 +226,13 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
           this.__yearsController = new qx.data.controller.List(null, control);
           this.__yearsController.set({
             allowNull: true,
-            nullValueTitle: "Year",
+            nullValueTitle: "Year"
           });
           this.__yearsController.setDelegate({
             bindItem: function (controller, item, index) {
               controller.bindProperty("", "label", null, item, index);
               controller.bindProperty("", "model", null, item, index);
-            },
+            }
           });
           break;
       }
@@ -273,7 +273,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
         { value: 8, label: this.tr("September") },
         { value: 9, label: this.tr("October") },
         { value: 10, label: this.tr("November") },
-        { value: 11, label: this.tr("December") },
+        { value: 11, label: this.tr("December") }
       ];
       return qx.data.marshal.Json.createModel(monthList);
     },
@@ -375,7 +375,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
      */
     __findNullItem: function (control) {
       return control.getChildren().find(function (item) {
-        return null === item.getModel();
+        return item.getModel() === null;
       });
     },
 
@@ -415,6 +415,6 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     __getDay: function () {
       var selected = this.__daysController.getSelection();
       return selected.getItem(0);
-    },
-  },
+    }
+  }
 });

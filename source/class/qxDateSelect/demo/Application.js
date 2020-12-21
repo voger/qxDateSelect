@@ -64,10 +64,8 @@ qx.Class.define("qxDateSelect.demo.Application", {
             return "Please set a valid date";
           }
 
-          var value = self.__formatter.format(value);
-          console.log(value);
-          return value;
-        },
+          return self.__formatter.format(value);
+        }
       });
 
       widgetContainer.add(label);
@@ -76,7 +74,7 @@ qx.Class.define("qxDateSelect.demo.Application", {
       // set date today button
       var button1 = new qx.ui.form.Button("Set date TODAY").set({
         allowGrowX: true,
-        allowStretchX: true,
+        allowStretchX: true
       });
       button1.addListener(
         "execute",
@@ -88,7 +86,7 @@ qx.Class.define("qxDateSelect.demo.Application", {
 
       // set various formats
       var select1 = new qx.ui.form.SelectBox().set({
-        width: 160,
+        width: 160
       });
       var model = ["DMY", "YDM", "MDY", "YMD", "DYM"];
       var select1Controller = new qx.data.controller.List(
@@ -104,12 +102,12 @@ qx.Class.define("qxDateSelect.demo.Application", {
             {
               converter: function (value) {
                 return "Set format to " + value;
-              },
+              }
             },
             item,
             id
           );
-        },
+        }
       });
       select1Controller.bind("selection[0]", dateSelect, "format", {
         onUpdate: function (_, target, data) {
@@ -143,7 +141,7 @@ qx.Class.define("qxDateSelect.demo.Application", {
           });
           self.__formatter = new qx.util.format.DateFormat(formatArr.join("/"));
           target.fireDataEvent("changeValue", target.getValue());
-        },
+        }
       });
 
       // Toggle allow null
@@ -162,6 +160,6 @@ qx.Class.define("qxDateSelect.demo.Application", {
 
       doc.add(widgetContainer, { top: 50, left: 50 });
       doc.add(buttonContainer, { top: 50, left: 500 });
-    },
-  },
+    }
+  }
 });
