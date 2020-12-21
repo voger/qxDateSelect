@@ -95,7 +95,10 @@ qx.Class.define("qxDateSelect.demo.Application", {
       widgetContainer.add(dateSelect);
 
       // set date today button
-      var button1 = new qx.ui.form.Button("Set date TODAY");
+      var button1 = new qx.ui.form.Button("Set date TODAY").set({
+        allowGrowX: true,
+        allowStretchX: true,
+      });
       button1.addListener(
         "execute",
         function () {
@@ -105,7 +108,9 @@ qx.Class.define("qxDateSelect.demo.Application", {
       );
 
       // set various formats
-      var select1 = new qx.ui.form.SelectBox();
+      var select1 = new qx.ui.form.SelectBox().set({
+        width: 160
+      });
       var model = ["DMY", "YDM", "MDY", "YMD", "DYM"];
       var select1Controller = new qx.data.controller.List(
         new qx.data.Array(model),
@@ -127,19 +132,10 @@ qx.Class.define("qxDateSelect.demo.Application", {
           );
         },
       });
-
-      select1.addListener(
-        "changeSelection",
-        function (e) {
-          var format = e.getData()[0].getModel();
-          dateSelect.setFormat(format);
-        },
-        this
-      );
+      select1Controller.bind("selection[0]", dateSelect, "format");
 
       var buttonContainer = new qx.ui.container.Composite(
-        new qx.ui.layout.Grid(6)
-      );
+        new qx.ui.layout.Grid(6, 6));
       buttonContainer.add(button1, { row: 0, column: 0 });
       buttonContainer.add(select1, { row: 1, column: 0 });
 
