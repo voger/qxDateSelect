@@ -21,6 +21,7 @@ qx.Class.define("qxDateSelect.demo.Application", {
      */
 
   members: {
+    __formatter: null,
     /**
      * This method contains the initial application code and gets called
      * during startup of the application
@@ -30,6 +31,7 @@ qx.Class.define("qxDateSelect.demo.Application", {
     main: function () {
       // Call super class
       this.base(arguments);
+      var self = this;
 
       // Enable logging in debug variant
       if (qx.core.Environment.get("qx.debug")) {
@@ -53,29 +55,6 @@ qx.Class.define("qxDateSelect.demo.Application", {
 
       var dateSelect = new qxDateSelect.QxDateSelect();
 
-      var formatter = function () {
-        var format = dateSelect.getFormat();
-        var formatArr = format.split("").map(function (item) {
-          var returnVal;
-          switch (item) {
-            case "Y":
-              returnVal = "yyyy";
-              break;
-            case "M":
-              returnVal = "MM";
-              break;
-            case "D":
-              returnVal = "dd";
-              break;
-            default:
-              throw new Error("Ooops!");
-          }
-
-          return returnVal;
-        });
-        // FIXME: this somehow need to be disposed
-        return new qx.util.format.DateFormat(formatArr.join("/"));
-      };
       var label = new qx.ui.basic.Label();
       label.setFont(new qx.bom.Font(28, ["Verdana", "sans-serif"]));
 
@@ -85,7 +64,7 @@ qx.Class.define("qxDateSelect.demo.Application", {
             return "Please set a valid date";
           }
 
-          var value = formatter().format(value);
+          var value = self.__formatter.format(value);
           console.log(value);
           return value;
         },
@@ -109,7 +88,7 @@ qx.Class.define("qxDateSelect.demo.Application", {
 
       // set various formats
       var select1 = new qx.ui.form.SelectBox().set({
-        width: 160
+        width: 160,
       });
       var model = ["DMY", "YDM", "MDY", "YMD", "DYM"];
       var select1Controller = new qx.data.controller.List(
@@ -132,10 +111,44 @@ qx.Class.define("qxDateSelect.demo.Application", {
           );
         },
       });
-      select1Controller.bind("selection[0]", dateSelect, "format");
+      select1Controller.bind("selection[0]", dateSelect, "format", {
+        onUpdate: function (_, target, data) {
+          // not sure why is called twice. 
+          // do nothing when data is undefined
+          if (!data ) {
+            return;
+          }
+
+          if (self.__formatter) {
+            self.__formatter.dispose();
+          }
+
+          var formatArr = data.split("").map(function (item) {
+            var returnVal;
+            switch (item) {
+              case "Y":
+                returnVal = "yyyy";
+                break;
+              case "M":
+                returnVal = "MM";
+                break;
+              case "D":
+                returnVal = "dd";
+                break;
+              default:
+                throw new Error("Ooops!");
+            }
+
+            return returnVal;
+          });
+          self.__formatter = new qx.util.format.DateFormat(formatArr.join("/"));
+           target.fireDataEvent("changeValue", target.getValue());
+        },
+      });
 
       var buttonContainer = new qx.ui.container.Composite(
-        new qx.ui.layout.Grid(6, 6));
+        new qx.ui.layout.Grid(6, 6)
+      );
       buttonContainer.add(button1, { row: 0, column: 0 });
       buttonContainer.add(select1, { row: 1, column: 0 });
 
