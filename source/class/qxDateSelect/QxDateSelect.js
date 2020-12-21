@@ -29,6 +29,12 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       nullable: false,
     },
 
+    allowNull: {
+      init: false,
+      check: "Boolean",
+      apply: "_applyAllowNull",
+    },
+
     /**
      * Selectable years. It can be a range in the format
      * `startYear..endYear"` where `startYear` is smaller
@@ -55,14 +61,14 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     /**
      * Whenever the value is changed this event is fired.
      * ** WARNING ** use this event with extreme caution.
-     * Every time a select box changes it's selection, this 
+     * Every time a select box changes it's selection, this
      * event is fired. This means this event is fired few times
      * before the widget settles to its final value. Don't make
      * any code decisions based on this event.
      *
-     * 
+     *
      */
-    "changeValue": "qx.event.type.Data",
+    changeValue: "qx.event.type.Data",
   },
 
   construct: function (date, format) {
@@ -335,6 +341,19 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       this.__setChildModel(this.__yearsController, model);
     },
 
+    _applyAllowNull: function (value) {
+      var day = this.getChildControl("day");
+      var month = this.getChildControl("month");
+      var year = this.getChildControl("year");
+
+      [day, month, year].forEach(function (control) {
+        var nullItem = control.getChildren().find(function (item) {
+          return null === item.getModel();
+        });
+        nullItem.setEnabled(value);
+      });
+    },
+
     __setChildModel: function (controller, model) {
       // save old selection to restore it
       var selection = controller.getSelection().getItem(0);
@@ -348,7 +367,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       var nullItem = control.getChildren().find(function (item) {
         return null === item.getModel();
       });
-      nullItem.setEnabled(false);
+      nullItem.setEnabled(this.getAllowNull());
     },
 
     /**
