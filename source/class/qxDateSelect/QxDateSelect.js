@@ -347,11 +347,9 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       var year = this.getChildControl("year");
 
       [day, month, year].forEach(function (control) {
-        var nullItem = control.getChildren().find(function (item) {
-          return null === item.getModel();
-        });
+        var nullItem = this.__findNullItem(control);
         nullItem.setEnabled(value);
-      });
+      }, this);
     },
 
     __setChildModel: function (controller, model) {
@@ -362,12 +360,23 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
       controller.getSelection().setItem(0, selection);
 
-      // disable the nullValue list item
+      // set the nullValue list item
       var control = controller.getTarget();
-      var nullItem = control.getChildren().find(function (item) {
+      var nullItem = this.__findNullItem(control);
+
+      nullItem.setEnabled(this.getAllowNull());
+    },
+
+    /**
+     * Returns the null item of a child control
+     *
+     * @param control {qx.ui.form.SelectBox} The child control
+     * @return {qx.ui.form.ListItem} The null child select
+     */
+    __findNullItem: function (control) {
+      return control.getChildren().find(function (item) {
         return null === item.getModel();
       });
-      nullItem.setEnabled(this.getAllowNull());
     },
 
     /**
