@@ -113,9 +113,9 @@ qx.Class.define("qxDateSelect.demo.Application", {
       });
       select1Controller.bind("selection[0]", dateSelect, "format", {
         onUpdate: function (_, target, data) {
-          // not sure why is called twice. 
+          // not sure why is called twice.
           // do nothing when data is undefined
-          if (!data ) {
+          if (!data) {
             return;
           }
 
@@ -142,15 +142,20 @@ qx.Class.define("qxDateSelect.demo.Application", {
             return returnVal;
           });
           self.__formatter = new qx.util.format.DateFormat(formatArr.join("/"));
-           target.fireDataEvent("changeValue", target.getValue());
+          target.fireDataEvent("changeValue", target.getValue());
         },
       });
+
+      // Toggle allow null
+      var button2 = new qx.ui.form.ToggleButton("Allow null value");
+      button2.bind("changeValue", dateSelect, "allowNull");
 
       var buttonContainer = new qx.ui.container.Composite(
         new qx.ui.layout.Grid(6, 6)
       );
       buttonContainer.add(button1, { row: 0, column: 0 });
       buttonContainer.add(select1, { row: 1, column: 0 });
+      buttonContainer.add(button2, { row: 2, column: 0 });
 
       var doc = this.getRoot();
       // doc.add(container, {edge: 0});
