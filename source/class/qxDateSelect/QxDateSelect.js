@@ -52,7 +52,17 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
   },
 
   events: {
-    changeValue: "qx.event.type.Data",
+    /**
+     * Whenever the value is changed this event is fired.
+     * ** WARNING ** use this event with extreme caution.
+     * Every time a select box changes it's selection, this 
+     * event is fired. This means this event is fired few times
+     * before the widget settles to its final value. Don't make
+     * any code decisions based on this event.
+     *
+     * 
+     */
+    "changeValue": "qx.event.type.Data",
   },
 
   construct: function (date, format) {
