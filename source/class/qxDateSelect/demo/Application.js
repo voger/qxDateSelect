@@ -151,9 +151,23 @@ qx.Class.define("qxDateSelect.demo.Application", {
 
       // reset values
       var button3 = new qx.ui.form.Button("Reset");
-      button3.addListener("execute", function() {
-        dateSelect.resetValue();
-      }, this);
+      button3.addListener(
+        "execute",
+        function () {
+          dateSelect.resetValue();
+        },
+        this
+      );
+
+      var button4 = new qx.ui.form.ToggleButton("Descending years");
+      button4.bind("value", dateSelect, "descendingYears");
+
+      var button5 = new qx.ui.form.ToggleButton("Invalid");
+      button5.bind("value", dateSelect, "valid", {
+        converter: function (val) {
+          return !val;
+        }
+      });
 
       var buttonContainer = new qx.ui.container.Composite(
         new qx.ui.layout.Grid(6, 6)
@@ -162,6 +176,8 @@ qx.Class.define("qxDateSelect.demo.Application", {
       buttonContainer.add(select1, { row: 1, column: 0 });
       buttonContainer.add(button2, { row: 2, column: 0 });
       buttonContainer.add(button3, { row: 3, column: 0 });
+      buttonContainer.add(button4, { row: 4, column: 0 });
+      buttonContainer.add(button5, { row: 5, column: 0 });
 
       var doc = this.getRoot();
       // doc.add(container, {edge: 0});

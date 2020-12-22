@@ -1,10 +1,7 @@
 qx.Class.define("qxDateSelect.QxDateSelect", {
   extend: qx.ui.core.Widget,
   implement: [qx.ui.form.IForm, qx.ui.form.IDateForm],
-  include: [
-    // qx.ui.core.MChildrenHandling,
-    qx.ui.form.MForm
-  ],
+  include: [qx.ui.form.MForm],
 
   properties: {
     focusable: {
@@ -29,6 +26,11 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       nullable: false
     },
 
+    /**
+     * Flag whether the select boxes can be set back to null
+     * values. Default `true`.
+     *
+     */
     allowNull: {
       init: false,
       check: "Boolean",
@@ -48,12 +50,17 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       validate: "_validateYears"
     },
 
-    reverseYears: {
+    /**
+     * Flag whether the years should be displayed in decending order.
+     * Default `true`.
+     *
+     */
+    descendingYears: {
       nullable: false,
       init: true,
       deferredInit: true,
       check: "Boolean",
-      apply: "_applyReverseYears"
+      apply: "_applyDescendingYears"
     }
   },
 
@@ -85,7 +92,11 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     // days model changes every time a select box is
     // changed so we should listen to it in order to
     // know if the value has changed.
-    this.getChildControl("day").addListener( "changeSelection", this.__fireChangeValue, this);
+    this.getChildControl("day").addListener(
+      "changeSelection",
+      this.__fireChangeValue,
+      this
+    );
 
     // initialize the date range
     var currentDate = new Date();
@@ -99,10 +110,18 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       this.initFormat();
     }
 
-    this.initReverseYears();
+    this.initDescendingYears();
   },
 
   members: {
+    /**
+     * @lint ignoreReferenceField(_forwardStates)
+     */
+    _forwardStates: {
+      focused: true,
+      invalid: true
+    },
+
     // controllers
     __daysContoller: null,
     __monthsController: null,
@@ -127,11 +146,15 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     },
 
     resetValue: function (value) {
-    this.__emmitChangeValue= false;
-      [this.__yearsController, this.__monthsController, this.__daysController].forEach(function(controller) {
+      this.__emmitChangeValue = false;
+      [
+        this.__yearsController,
+        this.__monthsController,
+        this.__daysController
+      ].forEach(function (controller) {
         controller.getSelection().setItem(0, null);
       }, this);
-      this.__emmitChangeValue= true;
+      this.__emmitChangeValue = true;
       this.__fireChangeValue();
     },
 
@@ -328,13 +351,15 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       this.__setChildModel(this.__yearsController, model);
     },
 
-    _applyReverseYears: function (value) {
+    _applyDescendingYears: function (value) {
       var array = this.__yearsController.getModel().toArray();
       array.sort(function (a, b) {
         return !value ? a - b : b - a;
       });
       var model = new qx.data.Array(array);
+      this.__emmitChangeValue = false;
       this.__setChildModel(this.__yearsController, model);
+      this.__emmitChangeValue = true;
     },
 
     _applyAllowNull: function (value) {
@@ -348,7 +373,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       }, this);
     },
 
-    __fireChangeValue: function() {
+    __fireChangeValue: function () {
       if (this.__emmitChangeValue) {
         this.fireDataEvent("changeValue", this.getValue());
       }
