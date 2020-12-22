@@ -82,20 +82,11 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
 
     this._setLayout(layout);
 
-    // this.getChildControl("year");
-    // this.getChildControl("month");
-
     // days model changes every time a select box is
     // changed so we should listen to it in order to
     // know if the value has changed.
-    this.getChildControl("day").addListener(
-      "changeSelection",
-      function () {
-        this.__emmitChangeValue &&
-          this.fireDataEvent("changeValue", this.getValue());
-      },
-      this
-    );
+    this.getChildControl("day").addListener( "changeSelection", this.__fireChangeValue, this);
+
     // initialize the date range
     var currentDate = new Date();
     var currentYear = currentDate.getFullYear();
@@ -132,11 +123,16 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       this.__daysController.getSelection().setItem(0, value.getDate());
 
       this.__emmitChangeValue = true;
-      this.fireDataEvent("changeValue", this.getValue());
+      this.__fireChangeValue();
     },
 
     resetValue: function (value) {
-      this.debug("resetValue(): To be done");
+    this.__emmitChangeValue= false;
+      [this.__yearsController, this.__monthsController, this.__daysController].forEach(function(controller) {
+        controller.getSelection().setItem(0, null);
+      }, this);
+      this.__emmitChangeValue= true;
+      this.__fireChangeValue();
     },
 
     getValue: function (value) {
@@ -350,6 +346,12 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
         var nullItem = this.__findNullItem(control);
         nullItem.setEnabled(value);
       }, this);
+    },
+
+    __fireChangeValue: function() {
+      if (this.__emmitChangeValue) {
+        this.fireDataEvent("changeValue", this.getValue());
+      }
     },
 
     __setChildModel: function (controller, model) {
