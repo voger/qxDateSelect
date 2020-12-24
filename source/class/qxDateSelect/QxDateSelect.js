@@ -118,8 +118,8 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
      * @lint ignoreReferenceField(_forwardStates)
      */
     _forwardStates: {
-      focused: true,
-      invalid: true
+      focused: true
+      // invalid: true
     },
 
     // controllers

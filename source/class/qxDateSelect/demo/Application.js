@@ -63,7 +63,6 @@ qx.Class.define("qxDateSelect.demo.Application", {
           if (!value) {
             return "Please set a valid date";
           }
-          console.log(value);
 
           return self.__formatter.format(value);
         }
@@ -169,6 +168,13 @@ qx.Class.define("qxDateSelect.demo.Application", {
         }
       });
 
+      var button6 = new qx.ui.form.ToggleButton("Disbled");
+      button6.bind("value", dateSelect, "enabled", {
+        converter: function (val) {
+          return !val;
+        }
+      });
+
       var buttonContainer = new qx.ui.container.Composite(
         new qx.ui.layout.Grid(6, 6)
       );
@@ -178,6 +184,7 @@ qx.Class.define("qxDateSelect.demo.Application", {
       buttonContainer.add(button3, { row: 3, column: 0 });
       buttonContainer.add(button4, { row: 4, column: 0 });
       buttonContainer.add(button5, { row: 5, column: 0 });
+      buttonContainer.add(button6, { row: 6, column: 0 });
 
       var doc = this.getRoot();
       // doc.add(container, {edge: 0});

@@ -8,11 +8,21 @@
 
 ************************************************************************ */
 
-qx.Theme.define("qxDateSelect.theme.Decoration",
-{
-  extend : qx.theme.indigo.Decoration,
+qx.Theme.define("qxDateSelect.theme.Decoration", {
+  extend: qx.theme.indigo.Decoration,
 
-  decorations :
-  {
+  decorations: {
+    "qx-date-select" :{
+      style: {
+        width: 1
+      }
+    },
+    "qx-date-select-invalid": {
+      include: "qx-date-select",
+
+      style: {
+        color: "invalid"
+      }
+    }
   }
 });
