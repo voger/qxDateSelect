@@ -186,15 +186,17 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
           control = new qx.ui.form.SelectBox();
           control.setFocusable(true);
 
-          this.__daysController = new qx.data.controller.List(null, control);
-          this.__daysController.set({
+          this.__daysController = new qx.data.controller.List(
+            null,
+            control
+          ).set({
             allowNull: true,
-            nullValueTitle: "Day"
-          });
-          this.__daysController.setDelegate({
-            bindItem: function (controller, item, index) {
-              controller.bindProperty("", "label", null, item, index);
-              controller.bindProperty("", "model", null, item, index);
+            nullValueTitle: "Day",
+            delegate: {
+              bindItem: function (controller, item, index) {
+                controller.bindProperty("", "label", null, item, index);
+                controller.bindProperty("", "model", null, item, index);
+              }
             }
           });
 
@@ -222,16 +224,14 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
             null,
             control,
             "label"
-          );
-
-          this.__monthsController.set({
+          ).set({
             allowNull: true,
-            nullValueTitle: "Month"
-          });
-          this.__monthsController.setDelegate({
-            bindItem: function (controller, item, index) {
-              controller.bindProperty("label", "label", null, item, index);
-              controller.bindProperty("value", "model", null, item, index);
+            nullValueTitle: "Month",
+            delegate: {
+              bindItem: function (controller, item, index) {
+                controller.bindProperty("label", "label", null, item, index);
+                controller.bindProperty("value", "model", null, item, index);
+              }
             }
           });
 
@@ -242,15 +242,17 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
           control = new qx.ui.form.SelectBox();
           control.setFocusable(true);
 
-          this.__yearsController = new qx.data.controller.List(null, control);
-          this.__yearsController.set({
+          this.__yearsController = new qx.data.controller.List(
+            null,
+            control
+          ).set({
             allowNull: true,
-            nullValueTitle: "Year"
-          });
-          this.__yearsController.setDelegate({
-            bindItem: function (controller, item, index) {
-              controller.bindProperty("", "label", null, item, index);
-              controller.bindProperty("", "model", null, item, index);
+            nullValueTitle: "Year",
+            delegate: {
+              bindItem: function (controller, item, index) {
+                controller.bindProperty("", "label", null, item, index);
+                controller.bindProperty("", "model", null, item, index);
+              }
             }
           });
           break;
