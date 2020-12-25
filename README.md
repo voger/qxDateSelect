@@ -9,10 +9,10 @@ Features:
 
 * The months and the labels are translatable.
 * The display format can be changed
-* Labels can be selectable or not. If they are selectable null value is allowed.
+* Labels can be selectable or not.
 * The value is a Javascript Date() object
 
-While care is taken, not to use features unknown to the old Python build tool, this library and
+While care is taken not to use features unknown to the old Python build tool, this library and
 the demo code are tested only with the qx compiler.
 
 
