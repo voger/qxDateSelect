@@ -3,7 +3,7 @@ A simple select date widget for Qooxdoo framework
 
 Inspired by Facebook's and Twitter's birthday selection widgets in their registration forms.
 
-![how it looks](https://raw.githubusercontent.com/voger/qxDateSelect/fix_image/screenshoots/screenshoot.png)
+![how it looks](https://raw.githubusercontent.com/voger/qxDateSelect/main/screenshoots/screenshoot.png)
 
 Features:
 
