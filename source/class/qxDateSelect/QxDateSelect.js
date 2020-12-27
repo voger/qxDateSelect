@@ -87,6 +87,10 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     layout.setColumnAlign(1, "center", "top");
     layout.setColumnAlign(2, "right", "top");
 
+    layout.setColumnFlex(1, 1);
+    layout.setColumnFlex(2, 1);
+    layout.setColumnFlex(3, 1);
+
     this._setLayout(layout);
 
     // days model changes every time a select box is
