@@ -24,8 +24,7 @@ qx.Theme.define("qxDateSelect.theme.Appearance", {
         }
 
         return {
-          decorator: decorator,
-          padding: 2
+          decorator: decorator
         };
       }
     },
