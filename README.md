@@ -25,3 +25,37 @@ $ npx qx serve
 and visit http://localhost:8080/
 
 
+To use it in your project:
+
+Within your qooxdoo project root folder update the packages list and install the package,
+
+```console
+$ npx pkg update
+$ npx pkg install voger/qxDateSelect
+```
+
+in your project's Appearance.js file include this packages Appearance.js
+
+```javascript
+  include: [
+    qxDateSelect.theme.Appearance
+  ],
+```
+
+and in your projects Decorations.js include this packages Decorations.js
+
+```javascript
+  include: [
+    qxDateSelect.theme.Decoration
+  ],
+```
+
+Instantiate a new qxDateSelect object using the `new` operator
+
+```javascript
+const dateSelect = new qxDateSelect.QxDateSelect();
+```
+
+
+
+
