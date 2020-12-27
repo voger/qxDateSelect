@@ -46,7 +46,7 @@ and in your projects Decorations.js include this packages Decorations.js
 
 ```javascript
   include: [
-  qxDateSelect.theme.Decoration
+    qxDateSelect.theme.Decoration
   ],
 ```
 
