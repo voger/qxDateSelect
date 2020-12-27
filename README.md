@@ -25,3 +25,12 @@ $ npx qx serve
 and visit http://localhost:8080/
 
 
+To use it in your project:
+
+Within your qooxdoo project root folder update the packages list and install the package
+
+```console
+
+```
+
+

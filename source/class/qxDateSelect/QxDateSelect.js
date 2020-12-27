@@ -119,7 +119,6 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
      */
     _forwardStates: {
       focused: true
-      // invalid: true
     },
 
     // controllers
