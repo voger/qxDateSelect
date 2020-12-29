@@ -6,12 +6,12 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
   properties: {
     focusable: {
       refine: true,
-      init: false
+      init: false,
     },
 
     appearance: {
       refine: true,
-      init: "qx-date-select"
+      init: "qx-date-select",
     },
 
     /**
@@ -23,7 +23,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       check: ["DMY", "YDM", "MDY", "YMD", "DYM"],
       init: "DMY",
       apply: "_applyFormat",
-      nullable: false
+      nullable: false,
     },
 
     /**
@@ -34,7 +34,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     allowNull: {
       init: false,
       check: "Boolean",
-      apply: "_applyAllowNull"
+      apply: "_applyAllowNull",
     },
 
     /**
@@ -47,7 +47,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       nullable: false,
       apply: "_applyYears",
       transform: "_transformYears",
-      validate: "_validateYears"
+      validate: "_validateYears",
     },
 
     /**
@@ -60,8 +60,8 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       init: true,
       deferredInit: true,
       check: "Boolean",
-      apply: "_applyDescendingYears"
-    }
+      apply: "_applyDescendingYears",
+    },
   },
 
   events: {
@@ -75,7 +75,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
      *
      *
      */
-    changeValue: "qx.event.type.Data"
+    changeValue: "qx.event.type.Data",
   },
 
   construct: function (date, format) {
@@ -122,7 +122,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
      * @lint ignoreReferenceField(_forwardStates)
      */
     _forwardStates: {
-      focused: true
+      focused: true,
     },
 
     // controllers
@@ -139,10 +139,15 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
      */
     setValue: function (value) {
       this.__emmitChangeValue = false;
-      // order matters otherwise February 29 might mess up
-      this.__yearsController.getSelection().setItem(0, value.getFullYear());
-      this.__monthsController.getSelection().setItem(0, value.getMonth());
-      this.__daysController.getSelection().setItem(0, value.getDate());
+
+      if (value !== null) {
+        // order matters otherwise February 29 might mess up
+        this.__yearsController.getSelection().setItem(0, value.getFullYear());
+        this.__monthsController.getSelection().setItem(0, value.getMonth());
+        this.__daysController.getSelection().setItem(0, value.getDate());
+      } else {
+        this.resetValue();
+      }
 
       this.__emmitChangeValue = true;
       this.__fireChangeValue();
@@ -153,7 +158,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
       [
         this.__yearsController,
         this.__monthsController,
-        this.__daysController
+        this.__daysController,
       ].forEach(function (controller) {
         controller.getSelection().setItem(0, null);
       }, this);
@@ -199,8 +204,8 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
               bindItem: function (controller, item, index) {
                 controller.bindProperty("", "label", null, item, index);
                 controller.bindProperty("", "model", null, item, index);
-              }
-            }
+              },
+            },
           });
 
           [this.getChildControl("month"), this.getChildControl("year")].forEach(
@@ -234,8 +239,8 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
               bindItem: function (controller, item, index) {
                 controller.bindProperty("label", "label", null, item, index);
                 controller.bindProperty("value", "model", null, item, index);
-              }
-            }
+              },
+            },
           });
 
           this.__setChildModel(this.__monthsController, this._getMonths());
@@ -255,8 +260,8 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
               bindItem: function (controller, item, index) {
                 controller.bindProperty("", "label", null, item, index);
                 controller.bindProperty("", "model", null, item, index);
-              }
-            }
+              },
+            },
           });
           break;
       }
@@ -297,7 +302,7 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
         { value: 8, label: this.tr("September") },
         { value: 9, label: this.tr("October") },
         { value: 10, label: this.tr("November") },
-        { value: 11, label: this.tr("December") }
+        { value: 11, label: this.tr("December") },
       ];
       return qx.data.marshal.Json.createModel(monthList);
     },
@@ -447,6 +452,6 @@ qx.Class.define("qxDateSelect.QxDateSelect", {
     __getDay: function () {
       var selected = this.__daysController.getSelection();
       return selected.getItem(0);
-    }
-  }
+    },
+  },
 });
